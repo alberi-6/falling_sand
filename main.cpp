@@ -39,6 +39,7 @@ void drawBoard(RenderWindow window, std::vector<int>& board, int width, int heig
 }
 
 int main(int argc, char* args[]) {
+    const int frameRate = 30;
     const int screenResolutionX = 1280;
     const int screenResolutionY = 720;
     const int scalingFactor = 10;
@@ -68,7 +69,12 @@ int main(int argc, char* args[]) {
     bool gameRunning = true;
 
     SDL_Event event;
+
+    Uint64 startTickMs, endTickMs, durationMs;
+    int timeStepMs = floor(1000 / frameRate);
     while (gameRunning) {
+        startTickMs = SDL_GetTicks64();
+
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
                 case SDL_QUIT:
@@ -85,7 +91,13 @@ int main(int argc, char* args[]) {
             }
         }
 
-        // update(window, gameBoard, scaledResolutionX, scaledResolutionY);
+        endTickMs = SDL_GetTicks64();
+        durationMs = endTickMs - startTickMs;
+        if (durationMs < timeStepMs) {
+            SDL_Delay(timeStepMs - (int)durationMs);
+        }
+
+        // updateBoard(window, gameBoard, scaledResolutionX, scaledResolutionY);
     }
 
     window.cleanUp();
