@@ -6,9 +6,36 @@
 
 #include "RenderWindow.hpp"
 
-std::vector<int> initBoard(int width, int height) {
-    std::vector<int> board(width * height, 0);
-    return board;
+void update(RenderWindow window, std::vector<int>& board, int width, int height) {
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            int state = board[i * width + j];
+
+            if (state == 1) {
+                int state_below = board[(i + 1) + j];
+                if (state_below == 0) {
+                    window.drawPixel(j, i, state);
+                }
+            }
+        }
+    }
+
+    window.update();
+}
+
+void handleMouseClickedEvent() {}
+
+void handleMouseMovingEvent() {}
+
+void drawBoard(RenderWindow window, std::vector<int>& board, int width, int height) {
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            int state = board[i * width + j];
+            window.drawPixel(j, i, state);
+        }
+    }
+
+    window.update();
 }
 
 int main(int argc, char* args[]) {
@@ -34,9 +61,9 @@ int main(int argc, char* args[]) {
     window.setRenderScale(scalingFactor, scalingFactor);
     window.clearWindow();
 
-    std::vector<int> gameBoard = initBoard(scaledResolutionX, scaledResolutionY);
-
-    std::cout << gameBoard.size() << std::endl;
+    std::vector<int> gameBoard(screenResolutionX * screenResolutionY, 0);
+    drawBoard(window, gameBoard, scaledResolutionX, scaledResolutionY);
+    gameBoard[5] = 1;
 
     bool gameRunning = true;
 
@@ -47,15 +74,18 @@ int main(int argc, char* args[]) {
                 case SDL_QUIT:
                     gameRunning = false;
                     break;
-
                 case SDL_MOUSEMOTION:
-                    std::cout << "mouse moving" << std::endl;
+                    handleMouseMovingEvent();
+                    break;
                 case SDL_MOUSEBUTTONDOWN:
-                    std::cout << "mouse pressed" << std::endl;
+                    handleMouseClickedEvent();
+                    break;
                 default:
                     break;
             }
         }
+
+        // update(window, gameBoard, scaledResolutionX, scaledResolutionY);
     }
 
     window.cleanUp();
