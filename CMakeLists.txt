@@ -11,11 +11,8 @@ target_include_directories(falling_sand PRIVATE include)
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
-
 include_directories(${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS})
 target_link_libraries(falling_sand PRIVATE ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
-
-target_include_directories(falling_sand PRIVATE /opt/homebrew/Cellar/sdl2_image/2.8.2_1/include/)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

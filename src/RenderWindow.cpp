@@ -1,7 +1,7 @@
 #include "RenderWindow.hpp"
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#include <SDL.h>
+#include <SDL_image.h>
 
 RenderWindow::RenderWindow(const char *p_Title, int p_Width, int p_Height)
     : window(NULL), renderer(NULL) {
