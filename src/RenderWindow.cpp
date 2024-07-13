@@ -3,16 +3,36 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
-RenderWindow::RenderWindow(const char *p_Title, int p_Width, int p_Height)
+RenderWindow::RenderWindow(const char *pTitle, int width, int height)
     : window(NULL), renderer(NULL) {
-    window = SDL_CreateWindow(p_Title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, p_Width,
-                              p_Height, SDL_WINDOW_SHOWN);
+    this->window = SDL_CreateWindow(pTitle, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+                                    width, height, SDL_WINDOW_SHOWN);
 
-    if (window == NULL) {
+    if (this->window == NULL) {
         printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
     }
 
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    this->renderer = SDL_CreateRenderer(this->window, -1, SDL_RENDERER_ACCELERATED);
+    SDL_RenderSetLogicalSize(this->renderer, width, height);
+
+    this->width = width;
+    this->height = height;
 }
 
 void RenderWindow::cleanUp() { SDL_DestroyWindow(window); }
+
+void RenderWindow::clearWindow() {
+    SDL_SetRenderDrawColor(this->renderer, 0, 0, 0, 255);
+    SDL_RenderClear(this->renderer);
+}
+
+void RenderWindow::setRenderScale(int scaleX, int scaleY) {
+    SDL_RenderSetScale(this->renderer, scaleX, scaleY);
+}
+
+void RenderWindow::drawPixel(int x, int y) {
+    SDL_SetRenderDrawColor(this->renderer, 255, 255, 255, 255);
+    SDL_RenderDrawPoint(this->renderer, x, y);
+}
+
+void RenderWindow::update() { SDL_RenderPresent(this->renderer); }

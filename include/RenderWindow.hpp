@@ -4,8 +4,16 @@
 
 class RenderWindow {
    public:
-    RenderWindow(const char *pTitle, int pWidth, int pHeight);
+    int width;
+    int height;
+
+    RenderWindow(const char *pTitle, int width, int height);
     void cleanUp();
+
+    void clearWindow();
+    void setRenderScale(int scaleX, int scaleY);
+    void drawPixel(int x, int y);
+    void update();
 
    private:
     SDL_Window *window;
