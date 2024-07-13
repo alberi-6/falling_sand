@@ -6,6 +6,8 @@
 #include "RenderWindow.hpp"
 
 int main(int argc, char* args[]) {
+    const char* pGameTitle = "Falling Sand";
+
     // Initialize SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
@@ -15,7 +17,9 @@ int main(int argc, char* args[]) {
         printf("IMG could not initialize! SDL_Error: %s\n", SDL_GetError());
     }
 
-    RenderWindow window("TEST", 1280, 720);
+    RenderWindow window(pGameTitle, 1280, 720);
+    window.setRenderScale(10, 10);
+    window.clearWindow();
 
     bool gameRunning = true;
 
