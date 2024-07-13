@@ -6,21 +6,28 @@
 
 #include "RenderWindow.hpp"
 
-void update(RenderWindow window, std::vector<int>& board, int width, int height) {
+void updateBoard(RenderWindow window, std::vector<int>& board, int width, int height) {
+    std::vector<int> nextBoard(width * height, 0);
+
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             int state = board[i * width + j];
 
             if (state == 1) {
+                std::cout << i << " " << j << std::endl;
                 int state_below = board[(i + 1) + j];
                 if (state_below == 0) {
-                    window.drawPixel(j, i, state);
+                    nextBoard[i * width + j] = 0;
+                    nextBoard[(i + 1) * width + j] = 1;
+
+                    window.drawPixel(j, i, 0);
+                    window.drawPixel(j, i + 1, 1);
                 }
             }
+
+            board[i * width + j] = nextBoard[i * width + j];
         }
     }
-
-    window.update();
 }
 
 void handleMouseClickedEvent() {}
@@ -60,7 +67,6 @@ int main(int argc, char* args[]) {
 
     RenderWindow window(pGameTitle, screenResolutionX, screenResolutionY);
     window.setRenderScale(scalingFactor, scalingFactor);
-    window.clearWindow();
 
     std::vector<int> gameBoard(screenResolutionX * screenResolutionY, 0);
     drawBoard(window, gameBoard, scaledResolutionX, scaledResolutionY);
@@ -91,13 +97,15 @@ int main(int argc, char* args[]) {
             }
         }
 
+        updateBoard(window, gameBoard, scaledResolutionX, scaledResolutionY);
+
         endTickMs = SDL_GetTicks64();
         durationMs = endTickMs - startTickMs;
         if (durationMs < timeStepMs) {
             SDL_Delay(timeStepMs - (int)durationMs);
         }
 
-        // updateBoard(window, gameBoard, scaledResolutionX, scaledResolutionY);
+        window.update();
     }
 
     window.cleanUp();
