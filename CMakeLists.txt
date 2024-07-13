@@ -4,7 +4,9 @@ project(falling_sand VERSION 0.1.0)
 set(SOURCES main.cpp src/RenderWindow.cpp)
 set(HEADERS include/RenderWindow.hpp)
 
+# for telling cmake where to locate FindSDL2_image.cmake
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+
 add_executable(falling_sand ${SOURCES} ${HEADERS})
 
 target_include_directories(falling_sand PRIVATE include)
