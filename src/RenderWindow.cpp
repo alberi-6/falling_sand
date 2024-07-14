@@ -31,8 +31,6 @@ void RenderWindow::setRenderScale(int scaleX, int scaleY) {
 }
 
 void RenderWindow::drawPixel(int x, int y, int state) {
-    this->clearWindow();
-
     if (state == 0) {
         SDL_SetRenderDrawColor(this->renderer, 0, 0, 0, 255);
     } else {

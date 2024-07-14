@@ -9,19 +9,22 @@
 void updateBoard(RenderWindow window, std::vector<int>& board, int width, int height) {
     std::vector<int> nextBoard(width * height, 0);
 
+    int state, state_below;
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            int state = board[i * width + j];
+            state = board[i * width + j];
 
             if (state == 1) {
-                int state_below = board[(i + 1) + j];
-                if (state_below == 0) {
-                    nextBoard[i * width + j] = 0;
-                    nextBoard[(i + 1) * width + j] = 1;
-
-                    window.drawPixel(j, i, 0);
-                    window.drawPixel(j, i + 1, 1);
+                if (i + 1 < height) {
+                    state_below = board[(i + 1) + j];
+                    if (state_below == 0) {
+                        state = 0;
+                        state_below = 1;
+                        nextBoard[(i + 1) * width + j] = state_below;
+                    }
                 }
+
+                nextBoard[i * width + j] = state;
             }
 
             board[i * width + j] = nextBoard[i * width + j];
@@ -34,6 +37,8 @@ void handleMouseClickedEvent() {}
 void handleMouseMovingEvent() {}
 
 void drawBoard(RenderWindow window, std::vector<int>& board, int width, int height) {
+    window.clearWindow();
+
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             int state = board[i * width + j];
@@ -68,8 +73,8 @@ int main(int argc, char* args[]) {
     window.setRenderScale(scalingFactor, scalingFactor);
 
     std::vector<int> gameBoard(screenResolutionX * screenResolutionY, 0);
-    drawBoard(window, gameBoard, scaledResolutionX, scaledResolutionY);
     gameBoard[5] = 1;
+    drawBoard(window, gameBoard, scaledResolutionX, scaledResolutionY);
 
     bool gameRunning = true;
 
@@ -97,14 +102,13 @@ int main(int argc, char* args[]) {
         }
 
         updateBoard(window, gameBoard, scaledResolutionX, scaledResolutionY);
+        drawBoard(window, gameBoard, scaledResolutionX, scaledResolutionY);
 
         endTickMs = SDL_GetTicks64();
         durationMs = endTickMs - startTickMs;
         if (durationMs < timeStepMs) {
             SDL_Delay(timeStepMs - (int)durationMs);
         }
-
-        window.update();
     }
 
     window.cleanUp();
