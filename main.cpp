@@ -27,33 +27,36 @@ std::vector<pixel> newBoard(int width, int height) {
 void updateBoard(RenderWindow window, std::vector<pixel>& board, int width, int height) {
     std::vector<pixel> nextBoard = newBoard(width, height);
 
-    int idx, idx_below, idx_below_left, idx_below_right;
-    int state, state_below, state_below_left, state_below_right;
+    int idx, idxBelow, idxBelowLeft, idxBelowRight;
+    int state, stateBelow, stateBelowLeft, stateBelowRight;
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             idx = i * width + j;
-            idx_below = (i + 1) * width + j;
-            idx_below_left = (i + 1) * width + (j - 1);
-            idx_below_right = (i + 1) * width + (j + 1);
+            idxBelow = (i + 1) * width + j;
+            idxBelowLeft = (i + 1) * width + (j - 1);
+            idxBelowRight = (i + 1) * width + (j + 1);
 
             state = board[idx].state;
             if (state == 1) {
                 if (i + 1 < height) {
-                    state_below = board[idx_below].state;
-                    if (state_below == 0) {
+                    stateBelow = board[idxBelow].state;
+                    if (stateBelow == 0) {
                         state = 0;
-                        state_below = 1;
-                        nextBoard[idx_below].state = state_below;
+                        stateBelow = 1;
+                        nextBoard[idxBelow].state = stateBelow;
                     } else {
                         if (j > 0) {
-                            state_below_left = board[idx_below_left].state;
-                            if (state_below_left == 0) {
+                            stateBelowLeft = board[idxBelowLeft].state;
+
+                            if (stateBelowLeft == 0) {
                                 state = 0;
-                                state_below_left = 1;
-                                nextBoard[idx_below_left].state = state_below;
+                                stateBelowLeft = 1;
+                                nextBoard[idxBelowLeft].state = stateBelow;
                             }
                         }
                     }
+                } else {
+                    nextBoard[idx].stationary = true;
                 }
 
                 nextBoard[idx].state = state;
