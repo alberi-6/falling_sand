@@ -16,7 +16,7 @@ void updateBoard(RenderWindow window, std::vector<int>& board, int width, int he
 
             if (state == 1) {
                 if (i + 1 < height) {
-                    state_below = board[(i + 1) + j];
+                    state_below = board[(i + 1) * width + j];
                     if (state_below == 0) {
                         state = 0;
                         state_below = 1;
