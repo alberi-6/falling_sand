@@ -29,6 +29,15 @@ void updateBoard(RenderWindow window, std::vector<int>& board, int width, int he
                         state = 0;
                         state_below = 1;
                         nextBoard[idx_below] = state_below;
+                    } else {
+                        if (j > 0) {
+                            state_below_left = board[idx_below_left];
+                            if (state_below_left == 0) {
+                                state = 0;
+                                state_below_left = 1;
+                                nextBoard[idx_below_left] = state_below;
+                            }
+                        }
                     }
                 }
 
