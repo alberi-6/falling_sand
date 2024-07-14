@@ -32,7 +32,14 @@ void updateBoard(RenderWindow window, std::vector<int>& board, int width, int he
     }
 }
 
-void handleMouseClickedEvent() {}
+void handleMouseClickedEvent(std::vector<int>& board, int width, int scalingFactor) {
+    int mouseX, mouseY;
+    SDL_GetMouseState(&mouseX, &mouseY);
+
+    mouseX /= scalingFactor;
+    mouseY /= scalingFactor;
+    board[mouseY * width + mouseX] = 1;
+}
 
 void handleMouseMovingEvent() {}
 
@@ -72,12 +79,8 @@ int main(int argc, char* args[]) {
     RenderWindow window(pGameTitle, screenResolutionX, screenResolutionY);
     window.setRenderScale(scalingFactor, scalingFactor);
 
-    std::vector<int> gameBoard(screenResolutionX * screenResolutionY, 0);
-    gameBoard[5] = 1;
-    drawBoard(window, gameBoard, scaledResolutionX, scaledResolutionY);
-
+    std::vector<int> gameBoard(scaledResolutionX * scaledResolutionY, 0);
     bool gameRunning = true;
-
     SDL_Event event;
 
     Uint64 startTickMs, endTickMs, durationMs;
@@ -94,7 +97,7 @@ int main(int argc, char* args[]) {
                     handleMouseMovingEvent();
                     break;
                 case SDL_MOUSEBUTTONDOWN:
-                    handleMouseClickedEvent();
+                    handleMouseClickedEvent(gameBoard, scaledResolutionX, scalingFactor);
                     break;
                 default:
                     break;
