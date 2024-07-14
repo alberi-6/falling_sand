@@ -9,8 +9,23 @@
 const int SCREEN_RESOLUTION_X = 1280;
 const int SCREEN_RESOLUTION_Y = 720;
 
-void updateBoard(RenderWindow window, std::vector<int>& board, int width, int height) {
-    std::vector<int> nextBoard(width * height, 0);
+struct pixel {
+    int state;
+    bool stationary;
+};
+
+std::vector<pixel> newBoard(int width, int height) {
+    std::vector<pixel> board(width * height);
+    for (int i = 0; i < board.size(); i++) {
+        pixel pixel = {0, false};
+        board[i] = pixel;
+    }
+
+    return board;
+}
+
+void updateBoard(RenderWindow window, std::vector<pixel>& board, int width, int height) {
+    std::vector<pixel> nextBoard = newBoard(width, height);
 
     int idx, idx_below, idx_below_left, idx_below_right;
     int state, state_below, state_below_left, state_below_right;
@@ -21,27 +36,27 @@ void updateBoard(RenderWindow window, std::vector<int>& board, int width, int he
             idx_below_left = (i + 1) * width + (j - 1);
             idx_below_right = (i + 1) * width + (j + 1);
 
-            state = board[idx];
+            state = board[idx].state;
             if (state == 1) {
                 if (i + 1 < height) {
-                    state_below = board[idx_below];
+                    state_below = board[idx_below].state;
                     if (state_below == 0) {
                         state = 0;
                         state_below = 1;
-                        nextBoard[idx_below] = state_below;
+                        nextBoard[idx_below].state = state_below;
                     } else {
                         if (j > 0) {
-                            state_below_left = board[idx_below_left];
+                            state_below_left = board[idx_below_left].state;
                             if (state_below_left == 0) {
                                 state = 0;
                                 state_below_left = 1;
-                                nextBoard[idx_below_left] = state_below;
+                                nextBoard[idx_below_left].state = state_below;
                             }
                         }
                     }
                 }
 
-                nextBoard[idx] = state;
+                nextBoard[idx].state = state;
             }
 
             board[idx] = nextBoard[idx];
@@ -49,7 +64,7 @@ void updateBoard(RenderWindow window, std::vector<int>& board, int width, int he
     }
 }
 
-void handleMouseHeldEvent(std::vector<int>& board, int width, int scalingFactor) {
+void handleMouseHeldEvent(std::vector<pixel>& board, int width, int scalingFactor) {
     int idx, mouseX, mouseY;
     SDL_GetMouseState(&mouseX, &mouseY);
 
@@ -59,18 +74,18 @@ void handleMouseHeldEvent(std::vector<int>& board, int width, int scalingFactor)
         mouseY /= scalingFactor;
 
         idx = mouseY * width + mouseX;
-        board[idx] = 1;
+        board[idx].state = 1;
     }
 }
 
-void drawBoard(RenderWindow window, std::vector<int>& board, int width, int height) {
+void drawBoard(RenderWindow window, std::vector<pixel>& board, int width, int height) {
     window.clearWindow();
 
     int idx, state;
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             idx = i * width + j;
-            state = board[idx];
+            state = board[idx].state;
             window.drawPixel(j, i, state);
         }
     }
@@ -99,7 +114,7 @@ int main(int argc, char* args[]) {
     RenderWindow window(pGameTitle, SCREEN_RESOLUTION_X, SCREEN_RESOLUTION_Y);
     window.setRenderScale(scalingFactor, scalingFactor);
 
-    std::vector<int> gameBoard(scaledResolutionX * scaledResolutionY, 0);
+    std::vector<pixel> gameBoard = newBoard(scaledResolutionX, scaledResolutionY);
     bool gameRunning = true;
     bool mouseIsPressed = false;
 
