@@ -6,6 +6,9 @@
 
 #include "RenderWindow.hpp"
 
+const int SCREEN_RESOLUTION_X = 1280;
+const int SCREEN_RESOLUTION_Y = 720;
+
 void updateBoard(RenderWindow window, std::vector<int>& board, int width, int height) {
     std::vector<int> nextBoard(width * height, 0);
 
@@ -32,16 +35,17 @@ void updateBoard(RenderWindow window, std::vector<int>& board, int width, int he
     }
 }
 
-void handleMouseClickedEvent(std::vector<int>& board, int width, int scalingFactor) {
+void handleMouseHeldEvent(std::vector<int>& board, int width, int scalingFactor) {
     int mouseX, mouseY;
     SDL_GetMouseState(&mouseX, &mouseY);
 
-    mouseX /= scalingFactor;
-    mouseY /= scalingFactor;
-    board[mouseY * width + mouseX] = 1;
+    if (0 <= mouseX && mouseX < SCREEN_RESOLUTION_X && 0 <= mouseY &&
+        mouseY < SCREEN_RESOLUTION_Y) {
+        mouseX /= scalingFactor;
+        mouseY /= scalingFactor;
+        board[mouseY * width + mouseX] = 1;
+    }
 }
-
-void handleMouseMovingEvent() {}
 
 void drawBoard(RenderWindow window, std::vector<int>& board, int width, int height) {
     window.clearWindow();
@@ -58,12 +62,10 @@ void drawBoard(RenderWindow window, std::vector<int>& board, int width, int heig
 
 int main(int argc, char* args[]) {
     const int frameRate = 30;
-    const int screenResolutionX = 1280;
-    const int screenResolutionY = 720;
     const int scalingFactor = 10;
 
-    const int scaledResolutionX = screenResolutionX / scalingFactor;
-    const int scaledResolutionY = screenResolutionY / scalingFactor;
+    const int scaledResolutionX = SCREEN_RESOLUTION_X / scalingFactor;
+    const int scaledResolutionY = SCREEN_RESOLUTION_Y / scalingFactor;
 
     const char* pGameTitle = "Falling Sand";
 
@@ -76,15 +78,16 @@ int main(int argc, char* args[]) {
         printf("IMG could not initialize! SDL_Error: %s\n", SDL_GetError());
     }
 
-    RenderWindow window(pGameTitle, screenResolutionX, screenResolutionY);
+    RenderWindow window(pGameTitle, SCREEN_RESOLUTION_X, SCREEN_RESOLUTION_Y);
     window.setRenderScale(scalingFactor, scalingFactor);
 
     std::vector<int> gameBoard(scaledResolutionX * scaledResolutionY, 0);
     bool gameRunning = true;
-    SDL_Event event;
+    bool mouseIsPressed = false;
 
     Uint64 startTickMs, endTickMs, durationMs;
     int timeStepMs = floor(1000 / frameRate);
+    SDL_Event event;
     while (gameRunning) {
         startTickMs = SDL_GetTicks64();
 
@@ -93,15 +96,18 @@ int main(int argc, char* args[]) {
                 case SDL_QUIT:
                     gameRunning = false;
                     break;
-                case SDL_MOUSEMOTION:
-                    handleMouseMovingEvent();
-                    break;
                 case SDL_MOUSEBUTTONDOWN:
-                    handleMouseClickedEvent(gameBoard, scaledResolutionX, scalingFactor);
+                    mouseIsPressed = true;
                     break;
+                case SDL_MOUSEBUTTONUP:
+                    mouseIsPressed = false;
                 default:
                     break;
             }
+        }
+
+        if (mouseIsPressed) {
+            handleMouseHeldEvent(gameBoard, scaledResolutionX, scalingFactor);
         }
 
         updateBoard(window, gameBoard, scaledResolutionX, scaledResolutionY);
