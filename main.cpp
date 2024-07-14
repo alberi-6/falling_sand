@@ -12,47 +12,56 @@ const int SCREEN_RESOLUTION_Y = 720;
 void updateBoard(RenderWindow window, std::vector<int>& board, int width, int height) {
     std::vector<int> nextBoard(width * height, 0);
 
-    int state, state_below;
+    int idx, idx_below, idx_below_left, idx_below_right;
+    int state, state_below, state_below_left, state_below_right;
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            state = board[i * width + j];
+            idx = i * width + j;
+            idx_below = (i + 1) * width + j;
+            idx_below_left = (i + 1) * width + (j - 1);
+            idx_below_right = (i + 1) * width + (j + 1);
 
+            state = board[idx];
             if (state == 1) {
                 if (i + 1 < height) {
-                    state_below = board[(i + 1) * width + j];
+                    state_below = board[idx_below];
                     if (state_below == 0) {
                         state = 0;
                         state_below = 1;
-                        nextBoard[(i + 1) * width + j] = state_below;
+                        nextBoard[idx_below] = state_below;
                     }
                 }
 
-                nextBoard[i * width + j] = state;
+                nextBoard[idx] = state;
             }
 
-            board[i * width + j] = nextBoard[i * width + j];
+            board[idx] = nextBoard[idx];
         }
     }
 }
 
 void handleMouseHeldEvent(std::vector<int>& board, int width, int scalingFactor) {
-    int mouseX, mouseY;
+    int idx, mouseX, mouseY;
     SDL_GetMouseState(&mouseX, &mouseY);
 
     if (0 <= mouseX && mouseX < SCREEN_RESOLUTION_X && 0 <= mouseY &&
         mouseY < SCREEN_RESOLUTION_Y) {
         mouseX /= scalingFactor;
         mouseY /= scalingFactor;
-        board[mouseY * width + mouseX] = 1;
+
+        idx = mouseY * width + mouseX;
+        board[idx] = 1;
     }
 }
 
 void drawBoard(RenderWindow window, std::vector<int>& board, int width, int height) {
     window.clearWindow();
 
+    int idx, state;
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            int state = board[i * width + j];
+            idx = i * width + j;
+            state = board[idx];
             window.drawPixel(j, i, state);
         }
     }
