@@ -2,6 +2,7 @@
 #include <SDL_image.h>
 
 #include <iostream>
+#include <random>
 #include <vector>
 
 #include "RenderWindow.hpp"
@@ -27,6 +28,7 @@ std::vector<pixel> newBoard(int width, int height) {
 void updateBoard(RenderWindow window, std::vector<pixel>& board, int width, int height) {
     std::vector<pixel> nextBoard = newBoard(width, height);
 
+    double direction;
     int idx, idxBelow, idxBelowLeft, idxBelowRight;
     int state, stateBelow, stateBelowLeft, stateBelowRight;
     for (int i = 0; i < height; i++) {
@@ -45,13 +47,24 @@ void updateBoard(RenderWindow window, std::vector<pixel>& board, int width, int 
                         stateBelow = 1;
                         nextBoard[idxBelow].state = stateBelow;
                     } else {
-                        if (j > 0) {
+                        // random +-1
+                        direction = std::copysign(1, ((double)rand() / (RAND_MAX)) - 0.5);
+
+                        if (direction == -1 && j > 0) {
                             stateBelowLeft = board[idxBelowLeft].state;
 
                             if (stateBelowLeft == 0) {
                                 state = 0;
                                 stateBelowLeft = 1;
-                                nextBoard[idxBelowLeft].state = stateBelow;
+                                nextBoard[idxBelowLeft].state = stateBelowLeft;
+                            }
+                        } else if (direction == 1 && j < width - 1) {
+                            stateBelowRight = board[idxBelowRight].state;
+
+                            if (stateBelowRight == 0) {
+                                state = 0;
+                                stateBelowRight = 1;
+                                nextBoard[idxBelowRight].state = stateBelowRight;
                             }
                         }
                     }
