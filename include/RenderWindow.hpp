@@ -12,7 +12,7 @@ class RenderWindow {
 
     void clearWindow();
     void setRenderScale(int scaleX, int scaleY);
-    void drawPixel(int x, int y, int state);
+    void drawPixel(int x, int y, SDL_Color color);
     void update();
 
    private:

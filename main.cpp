@@ -9,11 +9,12 @@
 
 const int SCREEN_RESOLUTION_X = 1280;
 const int SCREEN_RESOLUTION_Y = 720;
+SDL_Color DRAW_COLOR = {50, 50, 50};
 
-void cycleColor(SDL_Color& color) {
-    Uint8 r = color.r;
-    Uint8 g = color.g;
-    Uint8 b = color.b;
+void cycleColor() {
+    Uint8 r = DRAW_COLOR.r;
+    Uint8 g = DRAW_COLOR.g;
+    Uint8 b = DRAW_COLOR.b;
 
     if (r != 255) {
         r++;
@@ -25,19 +26,21 @@ void cycleColor(SDL_Color& color) {
         r = g = b = 0;
     }
 
-    color.r = r;
-    color.g = g;
-    color.b = b;
+    DRAW_COLOR.r = r;
+    DRAW_COLOR.g = g;
+    DRAW_COLOR.b = b;
 }
 
 struct pixel {
-    int state;
+    bool active;
+    SDL_Color color;
 };
 
 std::vector<pixel> newBoard(int width, int height) {
     std::vector<pixel> board(width * height);
     for (int i = 0; i < board.size(); i++) {
-        pixel pixel = {0};
+        SDL_Color initColor = {0, 0, 0};
+        pixel pixel = {false, initColor};
         board[i] = pixel;
     }
 
@@ -49,7 +52,8 @@ void updateBoard(RenderWindow window, std::vector<pixel>& board, int width, int 
 
     double direction;
     int idx, idxBelow, idxBelowLeft, idxBelowRight;
-    int state, stateBelow, stateBelowLeft, stateBelowRight;
+    bool active, activeBelow, activeBelowLeft, activeBelowRight;
+    SDL_Color color, colorBelow, colorBelowLeft, colorBelowRight;
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             idx = i * width + j;
@@ -59,34 +63,42 @@ void updateBoard(RenderWindow window, std::vector<pixel>& board, int width, int 
 
             // random +-1
             direction = std::copysign(1, ((double)rand() / (RAND_MAX)) - 0.5);
-            state = board[idx].state;
-            if (state == 1) {
+            active = board[idx].active;
+            color = board[idx].color;
+            if (active) {
                 if (i + 1 < height) {
-                    stateBelow = board[idxBelow].state;
-                    if (stateBelow == 0) {
-                        state = 0;
-                        stateBelow = 1;
-                        nextBoard[idxBelow].state = stateBelow;
+                    activeBelow = board[idxBelow].active;
+                    if (!activeBelow) {
+                        active = false;
+                        activeBelow = true;
+                        colorBelow = board[idx].color;
+                        nextBoard[idxBelow].active = activeBelow;
+                        nextBoard[idxBelow].color = colorBelow;
                     } else if (direction == -1 && j > 0) {
-                        stateBelowLeft = board[idxBelowLeft].state;
+                        activeBelowLeft = board[idxBelowLeft].active;
 
-                        if (stateBelowLeft == 0) {
-                            state = 0;
-                            stateBelowLeft = 1;
-                            nextBoard[idxBelowLeft].state = stateBelowLeft;
+                        if (!activeBelowLeft) {
+                            active = false;
+                            activeBelowLeft = true;
+                            colorBelowLeft = board[idx].color;
+                            nextBoard[idxBelowLeft].active = activeBelowLeft;
+                            nextBoard[idxBelowLeft].color = colorBelowLeft;
                         }
                     } else if (direction == 1 && j < width - 1) {
-                        stateBelowRight = board[idxBelowRight].state;
+                        activeBelowRight = board[idxBelowRight].active;
 
-                        if (stateBelowRight == 0) {
-                            state = 0;
-                            stateBelowRight = 1;
-                            nextBoard[idxBelowRight].state = stateBelowRight;
+                        if (!activeBelowRight) {
+                            active = false;
+                            activeBelowRight = true;
+                            colorBelowRight = board[idx].color;
+                            nextBoard[idxBelowRight].active = activeBelowRight;
+                            nextBoard[idxBelowRight].color = colorBelowRight;
                         }
                     }
                 }
 
-                nextBoard[idx].state = state;
+                nextBoard[idx].active = active;
+                nextBoard[idx].color = color;
             }
 
             board[idx] = nextBoard[idx];
@@ -104,19 +116,22 @@ void handleMouseHeldEvent(std::vector<pixel>& board, int width, int scalingFacto
         mouseY /= scalingFactor;
 
         idx = mouseY * width + mouseX;
-        board[idx].state = 1;
+        board[idx].active = true;
+        board[idx].color = DRAW_COLOR;
     }
+    cycleColor();
 }
 
 void drawBoard(RenderWindow window, std::vector<pixel>& board, int width, int height) {
     window.clearWindow();
 
-    int idx, state;
+    int idx;
+    SDL_Color color;
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             idx = i * width + j;
-            state = board[idx].state;
-            window.drawPixel(j, i, state);
+            color = board[idx].color;
+            window.drawPixel(j, i, color);
         }
     }
 
@@ -124,7 +139,7 @@ void drawBoard(RenderWindow window, std::vector<pixel>& board, int width, int he
 }
 
 int main(int argc, char* args[]) {
-    const int frameRate = 30;
+    const int frameRate = 60;
     const int scalingFactor = 10;
 
     const int scaledResolutionX = SCREEN_RESOLUTION_X / scalingFactor;
