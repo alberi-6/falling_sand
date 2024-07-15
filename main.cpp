@@ -10,6 +10,26 @@
 const int SCREEN_RESOLUTION_X = 1280;
 const int SCREEN_RESOLUTION_Y = 720;
 
+void cycleColor(SDL_Color& color) {
+    Uint8 r = color.r;
+    Uint8 g = color.g;
+    Uint8 b = color.b;
+
+    if (r != 255) {
+        r++;
+    } else if (g != 255) {
+        g++;
+    } else if (b != 255) {
+        b++;
+    } else {
+        r = g = b = 0;
+    }
+
+    color.r = r;
+    color.g = g;
+    color.b = b;
+}
+
 struct pixel {
     int state;
 };
