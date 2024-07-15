@@ -12,13 +12,12 @@ const int SCREEN_RESOLUTION_Y = 720;
 
 struct pixel {
     int state;
-    bool stationary;
 };
 
 std::vector<pixel> newBoard(int width, int height) {
     std::vector<pixel> board(width * height);
     for (int i = 0; i < board.size(); i++) {
-        pixel pixel = {0, false};
+        pixel pixel = {0};
         board[i] = pixel;
     }
 
@@ -38,6 +37,8 @@ void updateBoard(RenderWindow window, std::vector<pixel>& board, int width, int 
             idxBelowLeft = (i + 1) * width + (j - 1);
             idxBelowRight = (i + 1) * width + (j + 1);
 
+            // random +-1
+            direction = std::copysign(1, ((double)rand() / (RAND_MAX)) - 0.5);
             state = board[idx].state;
             if (state == 1) {
                 if (i + 1 < height) {
@@ -46,30 +47,23 @@ void updateBoard(RenderWindow window, std::vector<pixel>& board, int width, int 
                         state = 0;
                         stateBelow = 1;
                         nextBoard[idxBelow].state = stateBelow;
-                    } else {
-                        // random +-1
-                        direction = std::copysign(1, ((double)rand() / (RAND_MAX)) - 0.5);
+                    } else if (direction == -1 && j > 0) {
+                        stateBelowLeft = board[idxBelowLeft].state;
 
-                        if (direction == -1 && j > 0) {
-                            stateBelowLeft = board[idxBelowLeft].state;
+                        if (stateBelowLeft == 0) {
+                            state = 0;
+                            stateBelowLeft = 1;
+                            nextBoard[idxBelowLeft].state = stateBelowLeft;
+                        }
+                    } else if (direction == 1 && j < width - 1) {
+                        stateBelowRight = board[idxBelowRight].state;
 
-                            if (stateBelowLeft == 0) {
-                                state = 0;
-                                stateBelowLeft = 1;
-                                nextBoard[idxBelowLeft].state = stateBelowLeft;
-                            }
-                        } else if (direction == 1 && j < width - 1) {
-                            stateBelowRight = board[idxBelowRight].state;
-
-                            if (stateBelowRight == 0) {
-                                state = 0;
-                                stateBelowRight = 1;
-                                nextBoard[idxBelowRight].state = stateBelowRight;
-                            }
+                        if (stateBelowRight == 0) {
+                            state = 0;
+                            stateBelowRight = 1;
+                            nextBoard[idxBelowRight].state = stateBelowRight;
                         }
                     }
-                } else {
-                    nextBoard[idx].stationary = true;
                 }
 
                 nextBoard[idx].state = state;
