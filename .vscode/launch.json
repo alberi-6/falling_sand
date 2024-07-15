@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(LLDB) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/falling_sand",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        }
+    ]
+}
